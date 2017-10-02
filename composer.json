@@ -1,0 +1,20 @@
+{
+    "name": "bezdelnique/yii2-app",
+    "description": "Library of Yii2 common application parts ",
+    "type": "library",
+    "license": "MIT License",
+    "authors": [
+        {
+            "name": "Vitaly Belenky",
+            "email": "vitaly.belenky@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "require-dev": {
+        "codeception/verify": "^0.4.0",
+        "yiisoft/yii2": "^2.0"
+    }
+}

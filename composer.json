@@ -10,6 +10,11 @@
         }
     ],
     "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "bezdelnique\\yii2app\\": "src/"
+        }
+    },
     "require": {
         "php": ">=7.1.0"
     },

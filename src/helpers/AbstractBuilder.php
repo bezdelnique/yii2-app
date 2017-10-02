@@ -6,7 +6,7 @@
  * Time: 20:03
  */
 
-namespace bezdelnique\helpers;
+namespace bezdelnique\yii2app\helpers;
 
 
 class AbstractBuilder

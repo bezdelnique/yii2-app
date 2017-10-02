@@ -6,7 +6,7 @@
  * Time: 13:15
  */
 
-namespace bezdelnique\helpers;
+namespace bezdelnique\yii2app\helpers;
 
 
 class ExceptionHelper extends \Exception

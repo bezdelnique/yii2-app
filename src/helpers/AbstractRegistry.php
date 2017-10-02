@@ -6,7 +6,7 @@
  * Time: 21:04
  */
 
-namespace bezdelnique\helpers;
+namespace bezdelnique\yii2app\helpers;
 
 
 class AbstractRegistry

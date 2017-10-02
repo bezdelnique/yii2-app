@@ -39,7 +39,7 @@ class AbstractModel extends \yii\db\ActiveRecord
     }
 
 
-    public function setUrlManager(UrlManager $urlManager)
+    public function setUrlManager(IUrlManager $urlManager)
     {
         $this->_urlManager = $urlManager;
     }

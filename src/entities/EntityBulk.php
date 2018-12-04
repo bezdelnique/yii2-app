@@ -6,7 +6,7 @@
  * Time: 16:35
  */
 
-namespace app\entities;
+namespace bezdelnique\yii2app\entities;
 
 
 class EntityBulk

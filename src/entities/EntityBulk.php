@@ -9,6 +9,8 @@
 namespace bezdelnique\yii2app\entities;
 
 
+use yii\db\Exception;
+
 class EntityBulk
 {
     public const C_modeInsertNormal = 0;
@@ -142,23 +144,14 @@ class EntityBulk
                 $columns,
                 $bulkData)
                 ->getRawSql();
+            $sql = $this->_modifySql($sql);
 
-            // hack
-            if ($this->_modeInsert == self::C_modeInsertReplace) {
-                $sql = str_replace('INSERT INTO ', 'REPLACE INTO ', $sql);
-            } elseif ($this->_modeInsert == self::C_modeInsertIgnore) {
-                $sql = str_replace('INSERT INTO ', 'INSERT IGNORE INTO ', $sql);
-            } elseif ($this->_modeInsert == self::C_modeInsertUpdateOnDuplicate) {
-                $updatingColumns = [];
-                foreach ($this->_updateOnDuplicateColumns as $column) {
-                    $updatingColumns[] = sprintf('%s=VALUES(%s)', $column, $column);
-                }
-
-                $sql = sprintf('%s ON DUPLICATE KEY UPDATE %s', $sql, join(', ', $updatingColumns));
+            try {
+                \Yii::$app->db->createCommand($sql)
+                    ->execute();
+            } catch (Exception $e) {
+                $this->__doOneByOne();
             }
-
-            \Yii::$app->db->createCommand($sql)
-                ->execute();
 
             $this->_bulkData = [];
             $this->_bulkCnt = 0;
@@ -167,6 +160,55 @@ class EntityBulk
         }
 
         return false;
+    }
+
+
+    // Helps to debug batchInsert
+    private function __doOneByOne(): bool
+    {
+        if (!empty($this->_bulkData)) {
+            $bulkData = $this->_bulkData;
+            $className = $this->_classEntity;
+
+            $columns = array_keys(reset($bulkData));
+            foreach ($bulkData as $data) {
+                $sql = \Yii::$app->db->createCommand()->batchInsert(
+                    $className::tableName(),
+                    $columns,
+                    [$data])
+                    ->getRawSql();
+                $sql = $this->_modifySql($sql);
+
+                \Yii::$app->db->createCommand($sql)
+                    ->execute();
+            }
+
+            $this->_bulkData = [];
+            $this->_bulkCnt = 0;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private function _modifySql(string $sql): string
+    {
+        if ($this->_modeInsert == self::C_modeInsertReplace) {
+            $sql = str_replace('INSERT INTO ', 'REPLACE INTO ', $sql);
+        } elseif ($this->_modeInsert == self::C_modeInsertIgnore) {
+            $sql = str_replace('INSERT INTO ', 'INSERT IGNORE INTO ', $sql);
+        } elseif ($this->_modeInsert == self::C_modeInsertUpdateOnDuplicate) {
+            $updatingColumns = [];
+            foreach ($this->_updateOnDuplicateColumns as $column) {
+                $updatingColumns[] = sprintf('%s=VALUES(%s)', $column, $column);
+            }
+
+            $sql = sprintf('%s ON DUPLICATE KEY UPDATE %s', $sql, join(', ', $updatingColumns));
+        }
+
+        return $sql;
     }
 
 
